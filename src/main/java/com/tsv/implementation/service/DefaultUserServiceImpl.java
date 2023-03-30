@@ -29,6 +29,8 @@ public class DefaultUserServiceImpl implements DefaultUserService{
 	
    @Autowired
   	private RoleRepository roleRepo;
+
+	private Set<GrantedAuthority> authorities;
   	
   /* @Autowired
 	 JavaMailSender javaMailSender;*/
@@ -41,8 +43,10 @@ public class DefaultUserServiceImpl implements DefaultUserService{
 	
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-	
+
+		System.out.println(email);
 		User user = userRepo.findByEmail(email);
+		System.out.println(user);
 		if(user == null) {
 			throw new UsernameNotFoundException("Invalid username or password.");
 		}
@@ -52,6 +56,7 @@ public class DefaultUserServiceImpl implements DefaultUserService{
 	}
 	
 	private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> roles){
+
 		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getRole())).collect(Collectors.toList());
 	}
 
@@ -72,6 +77,9 @@ public class DefaultUserServiceImpl implements DefaultUserService{
 		user.setName(userRegisteredDTO.getName());
 		user.setPassword(passwordEncoder.encode(userRegisteredDTO.getPassword()));
 		user.setRole(role);
+		user.setCollage_id(userRegisteredDTO.getCollage_id());
+		user.setSem(userRegisteredDTO.getSem());
+		user.setBranch(userRegisteredDTO.getBranch());
 		return userRepo.save(user);
 	}
 

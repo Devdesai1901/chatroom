@@ -1,13 +1,15 @@
-import React from "react";
+import React, {useState} from "react";
 import Border from "../Components/Border";
 import "../Style/User_register.css";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useHistory } from "react-router-dom";
 
 export default function UserLogin() {
   const location = useLocation();
   const { role } = location.state;
+  const [status, setStatus] = useState(null);
+  // const history = useHistory();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -17,30 +19,37 @@ export default function UserLogin() {
     const password = e.target.password.value;
 
     const credentials = {
-      email: email,
+      email_id: email,
       password: password,
     };
 
     var res = [];
     try {
-      res = await axios.get("http://localhost:3001/users");
-      // console.log(res.data);
+      console.log(res.data);
+      res = await axios.post("http://localhost:8080/login/loginuser",credentials);
+      console.log(res.data);
+      setStatus(res.status);
     } catch (err) {
       alert(err);
     }
 
-    const temp = res.data;
-    temp.forEach((e) => {
-      if (
-        (e.email === credentials.email || e.clg_id === credentials.email) &&
-        e.password === credentials.password
-      ) {
-        // console.log("Yes");
-        navigate("/otp", { state: { name: e.name } });
-      }
-    });
+    // const temp = res.data;
+    // temp.forEach((e) => {
+    //   if (
+    //     (e.email === credentials.email || e.clg_id === credentials.email) &&
+    //     e.password === credentials.password
+    //   ) {
+    //     // console.log("Yes");
+    //     navigate("/otp", { state: { name: e.name } });
+    //   }
+    // });
 
     // console.log(credentials);
+    if (status === 200) {
+      navigate("/otp", { state: { name: e.name, role: role } });
+    }
+
+
   };
   return (
     <>
@@ -82,12 +91,12 @@ export default function UserLogin() {
               <p className="text-center text-sm">OR</p>
               <hr className="border-gray-400" />
             </div> */}
-            <p className="mt-5 text-xs border-b border-gray-400 py-4">
+            {/* <p className="mt-5 text-xs border-b border-gray-400 py-4">
               Forgot your password?
-            </p>
+            </p> */}
             <div className="mt-3 text-xs flex justify-between items-center">
               <p>If you are not a member....</p>
-              <Link to="/signup">
+              <Link to="/signup" state={{role}}>
                 <button className="py-2 px-5 bg-white hover:scale-110 duration-300 border rounded-xl">
                   Register
                 </button>

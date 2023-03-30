@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 export default function OtpScreen() {
   const location = useLocation();
-  const { name } = location.state;
+  const { name,role } = location.state;
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +20,7 @@ export default function OtpScreen() {
 
     var res = [];
     try {
-      res = await axios.get("http://localhost:3001/otps");
+      res = await axios.get("http://localhost:8080/login/otpverification");
       console.log(res.data);
     } catch (err) {
       alert(err);
@@ -29,7 +29,12 @@ export default function OtpScreen() {
     console.log(temp2);
     temp2.forEach((ele) => {
       if (ele.otp === temp) {
-        navigate("/topic", { state: { name: name } });
+        if(role === "Host"){
+          navigate("/topic", { state: { name: name } });
+        }
+        else{
+          navigate("/chatroom", { state: { name: name } });
+        }
         console.log("yes");
       } else {
         console.log("no");

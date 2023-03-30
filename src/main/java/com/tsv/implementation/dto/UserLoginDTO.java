@@ -2,19 +2,19 @@ package com.tsv.implementation.dto;
 
 public class UserLoginDTO {
 	
-private String username;
+private String email_id;
 	
 	private String password;
 	
 	private int otp;
 
-	
-	public String getUsername() {
-		return username;
+
+	public String getEmail_id() {
+		return email_id;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setEmail_id(String email_id) {
+		this.email_id = email_id;
 	}
 
 	public String getPassword() {

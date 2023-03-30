@@ -1,15 +1,15 @@
 package com.tsv.implementation.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import com.tsv.implementation.dto.UserRegisteredDTO;
 import com.tsv.implementation.service.DefaultUserService;
 
 @Controller
+@CrossOrigin("http://localhost:3000")
 @RequestMapping("/registration")
 public class RegistrationController {
 
@@ -25,15 +25,20 @@ public class RegistrationController {
 	        return new UserRegisteredDTO();
 	    }
 
-	    @GetMapping
-	    public String showRegistrationForm() {
-	        return "register";
-	    }
+//	    @GetMapping
+//	    public String showRegistrationForm() {
+//	        return "register";
+//	    }
 
-	    @PostMapping
-	    public String registerUserAccount(@ModelAttribute("user") 
+	    @PostMapping("/registeruser")
+	    public ResponseEntity<HttpStatus> registerUserAccount(@RequestBody
 	              UserRegisteredDTO registrationDto) {
-	        userService.save(registrationDto);
-	        return "redirect:/login";
+			try{
+				userService.save(registrationDto);
+				return new ResponseEntity<>(HttpStatus.OK);
+			}catch(Exception e) {
+				System.out.println(e);
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 	    }
 }

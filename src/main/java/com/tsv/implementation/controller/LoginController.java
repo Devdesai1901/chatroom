@@ -1,6 +1,9 @@
 package com.tsv.implementation.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,10 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import com.tsv.implementation.dao.UserRepository;
 import com.tsv.implementation.dto.UserLoginDTO;
@@ -27,6 +27,7 @@ import java.util.Collection;
 
 
 @Controller
+@CrossOrigin("http://localhost:3000")
 @RequestMapping("/login")
 public class LoginController {
 	@Autowired
@@ -45,12 +46,21 @@ public class LoginController {
 		return "login";
 	}
 	
-	@PostMapping
-	public void loginUser(@ModelAttribute("user") 
+	@PostMapping("/loginuser")
+	public ResponseEntity<HttpStatus> loginUser(@RequestBody
 	UserLoginDTO userLoginDTO) {
-		System.out.println("UserDTO"+userLoginDTO);
-		 userService.loadUserByUsername(userLoginDTO.getUsername());
-	}
+		try {
+			System.out.println("UserDTO" + userLoginDTO);
+			System.out.println(userLoginDTO.getEmail_id());
+			System.out.println(userLoginDTO.getPassword());
+			userService.loadUserByUsername(userLoginDTO.getEmail_id());
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		}
 	@GetMapping("/otpVerification")
 	public String otpSent(Model model,UserLoginDTO userLoginDTO) {
 		model.addAttribute("otpValue", userLoginDTO);

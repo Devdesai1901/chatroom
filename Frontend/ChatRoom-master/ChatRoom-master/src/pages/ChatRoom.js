@@ -6,7 +6,7 @@ import "./ChatRoom.scss";
 
 export default function ChatRoom() {
   const location = useLocation();
-  const { topic, name } = location.state;
+  const { topic,name } = location.state;
   const navigate = useNavigate();
 
   const [messages, SetMessages] = useState([]);

@@ -33,7 +33,7 @@ export default function UserLogin() {
               {/* <input className="p-2 rounded-xl border" type="text" name="mobileNo" placeholder="Enter Phone No."/> */}
 
               <button className="bg-[#5b5656] rounded-xl text-white hover:scale-105 duration-300 py-2">
-                <Link to="/addparticipant" state={{ topic: topic, name: name }}>
+                <Link to="/addparticipant" state={{ name: name }}>
                   Enter Chat Room
                 </Link>
               </button>
