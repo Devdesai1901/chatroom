@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Controller
+@CrossOrigin("http://localhost:3000" )
 @RequestMapping("/api")
 public class ChatMessageController {
     @Autowired

@@ -25,13 +25,20 @@ export default function UserLogin() {
 
     var res = [];
     try {
-      console.log(res.data);
       res = await axios.post("http://localhost:8080/login/loginuser",credentials);
+      alert("You have successfully logged in");
       console.log(res.data);
       setStatus(res.status);
     } catch (err) {
       alert(err);
     }
+    // try{
+    //   res = await axios.post("http://localhost:8080/login/otpVerification",credentials);
+    //   setStatus(res.status);
+    // }
+    // catch(err){
+    //   alert(err);
+    // }
 
     // const temp = res.data;
     // temp.forEach((e) => {
@@ -46,7 +53,13 @@ export default function UserLogin() {
 
     // console.log(credentials);
     if (status === 200) {
-      navigate("/otp", { state: { name: e.name, role: role } });
+      if(role == "HOST"){
+        navigate("/generatelink", { state: { name: e.name, role: role } });
+      }
+      else{
+        navigate("/pastelink", { state: { name: e.name, role: role } });
+      }
+      
     }
 
 

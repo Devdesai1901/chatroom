@@ -96,10 +96,10 @@ export default function UserRegister() {
                 aria-label="Default select example"
               >
                 <option selected>Select Role</option>
-                <option value="Admin">Admin</option>
+                <option value="ADMIN">Admin</option>
                 {/* <option value="Co-odrinator">Co-odrinator</option> */}
-                <option value="Host">Host</option>
-                <option value="User">User</option>
+                <option value="HOST">Host</option>
+                <option value="USER">User</option>
                 {/* <option value="Viewer">Viewer</option> */}
               </select>
               

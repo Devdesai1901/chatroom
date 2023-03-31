@@ -20,11 +20,12 @@ export default function OtpScreen() {
 
     var res = [];
     try {
-      res = await axios.get("http://localhost:8080/login/otpverification");
+      res = await axios.get("http://localhost:8080/login/otpVerification");
       console.log(res.data);
     } catch (err) {
       alert(err);
     }
+    
     const temp2 = res.data;
     console.log(temp2);
     temp2.forEach((ele) => {

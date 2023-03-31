@@ -8,6 +8,15 @@ private String email_id;
 	
 	private int otp;
 
+	private String role;
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
 
 	public String getEmail_id() {
 		return email_id;

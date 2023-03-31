@@ -19,6 +19,11 @@ public class User {
 	
 	private String password;
 
+	private String role;
+
+	public void setRole(String role) {
+		this.role = role;
+	}
 
 	private int sem;
 
@@ -73,13 +78,17 @@ public class User {
 		this.id = id;
 	}
 
-	public Set<Role> getRole() {
-		return roles;
+	public String getRole() {
+		return role;
 	}
 
-	public void setRole(Role role) {
-		this.roles.add(role);
-	}
+//	public Set<Role> getRole() {
+//		return roles;
+//	}
+//
+//	public void setRole(Role role) {
+//		this.roles.add(role);
+//	}
 
 	public String getName() {
 		return name;
@@ -113,7 +122,6 @@ public class User {
 	public void setOtp(int otp) {
 		this.otp = otp;
 	}
-	
-	
-	
+
+
 }

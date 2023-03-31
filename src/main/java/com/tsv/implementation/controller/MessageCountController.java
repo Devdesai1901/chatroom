@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 
 @Controller
+@CrossOrigin("http://localhost:3000" )
 @RequestMapping("/count")
 public class MessageCountController
 {
