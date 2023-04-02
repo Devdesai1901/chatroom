@@ -3,29 +3,29 @@ package com.tsv.implementation.dto;
 
 public class UserRegisteredDTO {
 
-	
-    private String name;
-	
-	
-	
+
+	private String name;
+
+
+
 	private String email_id;
-	
+
 	private String password;
-	
-	String role;
+
+	private String role;
 
 
-	private int sem;
+	private String sem;
 
 	private String branch;
 
 	private  String collage_id;
 
-	public int getSem() {
+	public String getSem() {
 		return sem;
 	}
 
-	public void setSem(int sem) {
+	public void setSem(String sem) {
 		this.sem = sem;
 	}
 
@@ -53,7 +53,7 @@ public class UserRegisteredDTO {
 		this.name = name;
 	}
 
-	
+
 	public String getEmail_id() {
 		return email_id;
 	}
@@ -66,7 +66,7 @@ public class UserRegisteredDTO {
 		return password;
 	}
 
-	
+
 
 	public String getRole() {
 		return role;
@@ -79,6 +79,6 @@ public class UserRegisteredDTO {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	
+
+
 }

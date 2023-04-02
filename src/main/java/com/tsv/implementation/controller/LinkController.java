@@ -9,18 +9,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@CrossOrigin("http://localhost:3000" )
 @RequestMapping("/link")
 public class LinkController
 {
 
     @Autowired
     LinkService linkService;
-
-    private Link link;
 
     @Autowired
     LinkRepository linkRepository;
@@ -30,26 +30,26 @@ public class LinkController
     {
         return new Link();
     }*/
-//    @GetMapping
-//    public String showLinkGeneratorPage(Model model)
-//    {
-//        SecurityContext securityContext = SecurityContextHolder.getContext();
-//        UserDetails user = (UserDetails)securityContext.getAuthentication().getPrincipal();
-//        Link lo = linkRepository.findByHostName(user.getUsername());
-//        if(lo != null)
-//        {
-//            model.addAttribute("link" ,lo.getLink());
-//        }
-//
-//        return "GenerateLink";
-//    }
+    @GetMapping
+    public String showLinkGeneratorPage(Model model)
+    {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        UserDetails user = (UserDetails)securityContext.getAuthentication().getPrincipal();
+        Link lo = linkRepository.findByHostName(user.getUsername());
+        if(lo != null)
+        {
+            model.addAttribute("link" ,lo.getLink());
+        }
+
+        return "GenerateLink";
+    }
 
 
     @PostMapping("/generate")
-    @ResponseBody
-    public String generateLink() {
+    public String generateLink()
+    {
         linkService.generate();
 
-        return link.getLink()+"";
+        return "redirect:/link";
     }
 }

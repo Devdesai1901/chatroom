@@ -9,19 +9,18 @@ import javax.persistence.Table;
 @Entity
 @Table(name="role")
 public class Role {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	private String role;
 
 
 	@Override
 	public String toString() {
 		return "Role{" +
-				"id=" + id +
-				", role='" + role + '\'' +
+				"role='" + role + '\'' +
 				'}';
 	}
 
@@ -41,6 +40,6 @@ public class Role {
 		this.role = role;
 	}
 
-	
-	
+
+
 }

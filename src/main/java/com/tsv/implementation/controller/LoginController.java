@@ -1,12 +1,17 @@
 package com.tsv.implementation.controller;
 
+import com.tsv.implementation.Security.JwtAuthResponse;
+import com.tsv.implementation.Security.JwtTokenHelper;
+import com.tsv.implementation.config.CustomSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,15 +32,23 @@ import java.io.IOException;
 import java.util.Collection;
 
 
+@CrossOrigin("http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 @Controller
-@CrossOrigin("http://localhost:3000" )
 @RequestMapping("/login")
 public class LoginController {
 	@Autowired
 	private DefaultUserService userService;
-	
+
+	@Autowired
+	private JwtTokenHelper jwtTokenHelper;
 	@Autowired
 	UserRepository userRepo;
+
+	@Autowired
+	AuthenticationManager authenticationManager;
+
+
     
     @ModelAttribute("user")
     public UserLoginDTO userLoginDTO() {
@@ -47,63 +60,116 @@ public class LoginController {
 		return "login";
 	}
 	
-	@PostMapping("/loginuser")
-	public ResponseEntity<HttpStatus> loginUser(@RequestBody
+	@PostMapping
+	public void loginUser(@ModelAttribute("user") 
 	UserLoginDTO userLoginDTO) {
-		try {
-			System.out.println("UserDTO" + userLoginDTO);
-			System.out.println(userLoginDTO.getEmail_id());
-			System.out.println(userLoginDTO.getPassword());
-			userService.loadUserByUsername(userLoginDTO.getEmail_id());
-			return new ResponseEntity<>(HttpStatus.OK);
-		}catch(Exception e)
-		{
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		}
+		System.out.println("UserDTO"+userLoginDTO);
+		//customSuccessHandler.getLoginUsers(userLoginDTO);
+		//userService.loadUserByUsername(userLoginDTO.getUsername());
+	}
 //	@GetMapping("/otpVerification")
-//	public String otpSent(Model model,UserLoginDTO userLoginDTO) {
+//	public String otpSent(Model model,UserLoginDTO userLoginDTO , @RequestHeader("Authorization") String authorizationHeader) {
+//      //* String token = authorizationHeader.replace("Bearer " , "");
 //		model.addAttribute("otpValue", userLoginDTO);
 //		return "otpScreen";
 //
 //	}
-
 	@PostMapping("/otpVerification")
-	public ResponseEntity<HttpStatus> otpVerification(@RequestBody UserLoginDTO userLoginDTO, Authentication authentication) throws IOException {
-		try {
-			if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-				UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-				User users = userRepo.findByEmail(userDetails.getUsername());
-
-				if (users != null) {
-					if (users.getOtp() == userLoginDTO.getOtp()) {
-						return new ResponseEntity<>(HttpStatus.OK);
-					} else {
-						System.out.println("OTP verification failed: OTP entered by user does not match stored OTP");
-						return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-					}
-				} else {
-					System.out.println("User not found in database for email: " + userDetails.getUsername());
-					return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-				}
-			} else {
-				System.out.println("Authentication object is null or principal is not an instance of UserDetails");
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	public ResponseEntity<HttpStatus> otpVerification(@RequestBody UserLoginDTO userLoginDTO) {
+//		SecurityContext securityContext = SecurityContextHolder.getContext();
+//		UserDetails user = (UserDetails) securityContext.getAuthentication().getPrincipal();
+		System.out.println("send");
+		User users = userRepo.findByEmail(userLoginDTO.getEmail_id());
+		System.out.println("Receive");
+//        String redirectUrl = null;
+		try{
+			if(users.getOtp() == userLoginDTO.getOtp()) {
+				return new ResponseEntity<>(HttpStatus.OK);
 			}
-		} catch (Exception e) {
+			else{
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+		}catch (Exception e){
 			e.printStackTrace();
-			System.out.println("Exception caught during OTP verification: " + e.getMessage());
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
 	}
 
-	/*//////////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+	//@RequestBody
+	@PostMapping("/authenticate")
+	public  ResponseEntity<JwtAuthResponse> createToken(@RequestBody UserLoginDTO request)
+	{
+		System.out.println("hello0");
+//        String redirectUrl = null;
+		String token = null;
+		System.out.println(request.getEmail_id());
+		System.out.println(request.getPassword());
+		this.authenticate(request.getEmail_id() , request.getPassword());
+		System.out.println("hello1");
+		/*UserDetails userDetails = this.userService.loadUserByUsername(request.getUsername());
+		if(userDetails != null) {
+			System.out.println("hi");
+			String username = userDetails.getUsername();
+			User user = userRepo.findByEmail(username);
+			String output = userService.generateOtp(user);
+			UserLoginDTO userLoginDTO = new UserLoginDTO();
+			userLoginDTO.setUsername(request.getUsername());
+			userLoginDTO.setPassword(request.getPassword());*/
+			token = this.jwtTokenHelper.generateToken(request);
+			/*System.out.println(token);
+			if(output=="success")
+			{
+				redirectUrl="/login/otpVerification" ;
+				return redirectUrl;
+			}*/
+
+			JwtAuthResponse response = new JwtAuthResponse();
+			response.setToken(token);
+			return  new ResponseEntity<JwtAuthResponse>(response, HttpStatus.OK);
+	}
+
+	public void authenticate(String username , String password)
+	{
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,password);
+//		try
+//		{
+//			System.out.println("hello2");
+			try{
+				System.out.println(username);
+				System.out.println(password);
+				this.authenticationManager.authenticate(authenticationToken);
+//				System.out.println("hello4");
+				User user = userRepo.findByEmail(username);
+				if(user != null)
+				{
+//					System.out.println("hello3");
+					String output = userService.generateOtp(user);
+//					System.out.println("hello5");
+				}
+			}catch (AuthenticationException e){
+				e.printStackTrace();
+			}
+
+//		}
+//		catch (DisabledException e)
+//		{
+//			e.printStackTrace();
+//		}
+
+	}
+	
+}
 
 
-//			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
+//	Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 //			for(GrantedAuthority grantedAuthority : authorities)
 //			{
+//
+//
+//
 //				if(grantedAuthority.getAuthority().equals("USER"))
 //				{
 //					 return "redirect:/verifyLink";//redirectUrl = "/verifyLink";
@@ -114,6 +180,8 @@ public class LoginController {
 //				}
 //
 //			}
+
+
 //			if(redirectUrl == null)
 //			{
 //				throw  new IllegalStateException();
@@ -124,5 +192,3 @@ public class LoginController {
 //		}
 //		else
 //			return "redirect:/login/otpVerification?error";
-	
-}

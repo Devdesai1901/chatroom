@@ -37,7 +37,8 @@
 
             let messageData = {
                 chat_message: $("#message-value").val(),
-                username: $("#name-value").val()
+                username: $("#name-value").val(),
+                role: $("#role-value").val()
 
             }
 
@@ -265,6 +266,16 @@
             readonly
             hidden
     />
+
+    <input
+            type="text"
+            id="role-value"
+            class="form-control"
+            th:value ="*{role}"
+            readonly
+            hidden
+    />
+
 
 </div>
 <script src="../static/script.js"></script>

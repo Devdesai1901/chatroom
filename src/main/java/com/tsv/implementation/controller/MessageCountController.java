@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 
 @Controller
-@CrossOrigin("http://localhost:3000" )
 @RequestMapping("/count")
 public class MessageCountController
 {
@@ -52,10 +51,13 @@ public class MessageCountController
        // System.out.println("hii");
        // System.out.println(email);
         MessageCount user = messageCountRepository.findByUserName(email);
-        int count =  user.getMessageCount();
-        count = count + 1;
-        user.setMessageCount(count);
-        messageCountRepository.save(user);
+
+
+            int count =  user.getMessageCount();
+            count = count + 1;
+            user.setMessageCount(count);
+            messageCountRepository.save(user);
+
     }
     @GetMapping
     public String showAddUserPage()

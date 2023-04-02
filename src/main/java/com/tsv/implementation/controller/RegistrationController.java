@@ -35,10 +35,12 @@ public class RegistrationController {
 	              UserRegisteredDTO registrationDto) {
 			try{
 				userService.save(registrationDto);
+//	        	return "redirect:/login";
 				return new ResponseEntity<>(HttpStatus.OK);
-			}catch(Exception e) {
-				System.out.println(e);
+			}catch (Exception e){
+				e.printStackTrace();
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+
 	    }
 }

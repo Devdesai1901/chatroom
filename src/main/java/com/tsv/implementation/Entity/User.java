@@ -12,18 +12,13 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	
+
 	private String name;
-	
+
 	private String email;
-	
+
 	private String password;
 
-	private String role;
-
-	public void setRole(String role) {
-		this.role = role;
-	}
 
 	private int sem;
 
@@ -35,8 +30,8 @@ public class User {
 		return sem;
 	}
 
-	public void setSem(int sem) {
-		this.sem = sem;
+	public void setSem(String sem) {
+		this.sem = Integer.parseInt(sem);
 	}
 
 	public String getBranch() {
@@ -60,15 +55,15 @@ public class User {
 		return roles;
 	}
 
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
+	public void setRoles(Role role) {
+		this.roles.add(role);
 	}
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
 	@JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "cust_id", referencedColumnName = "id"),
-	inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id") )
+			inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id") )
 	Set<Role> roles = new HashSet<Role>();
-	
+
 	private int otp;
 	public int getId() {
 		return id;
@@ -78,9 +73,9 @@ public class User {
 		this.id = id;
 	}
 
-	public String getRole() {
-		return role;
-	}
+//	public String getRole() {
+//		return role;
+//	}
 
 //	public Set<Role> getRole() {
 //		return roles;
@@ -98,7 +93,7 @@ public class User {
 		this.name = name;
 	}
 
-	
+
 	public String getEmail() {
 		return email;
 	}

@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useRef,useState}from "react";
 import Border from "../Components/Border";
 import "../Style/User_register.css";
 import axios from "axios";
@@ -6,8 +6,23 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 export default function OtpScreen() {
   const location = useLocation();
-  const { name,role } = location.state;
+  const { name,role,data } = location.state;
+  const [status, setStatus] = useState(null);
   const navigate = useNavigate();
+
+  const val1Ref = useRef(null);
+  const val2Ref = useRef(null);
+  const val3Ref = useRef(null);
+  const val4Ref = useRef(null);
+
+  const focusNext = (event, nextRef) => {
+    const input = event.target;
+    if (input.value.length >= input.maxLength) {
+      nextRef.current.focus();
+    }
+  };
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     const val1 = String(e.target.val1.value);
@@ -15,32 +30,37 @@ export default function OtpScreen() {
     const val3 = String(e.target.val3.value);
     const val4 = String(e.target.val4.value);
 
+    const token = "Bearer " + localStorage.getItem("Token");
+
     const temp = val1 + val2 + val3 + val4;
     console.log(temp);
 
+    const credentials = {
+      email_id: data.email_id,
+      password: data.password,
+      otp: temp,
+    };
+
     var res = [];
     try {
-      res = await axios.get("http://localhost:8080/login/otpVerification");
+      
+      res = await axios.post("http://localhost:8080/login/otpVerification",credentials,{headers:{"Authorization":token}});
+      // axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       console.log(res.data);
+      console.log(token);
+      setStatus(res.status);
     } catch (err) {
       alert(err);
     }
-    
-    const temp2 = res.data;
-    console.log(temp2);
-    temp2.forEach((ele) => {
-      if (ele.otp === temp) {
-        if(role === "Host"){
-          navigate("/topic", { state: { name: name } });
-        }
-        else{
-          navigate("/chatroom", { state: { name: name } });
-        }
-        console.log("yes");
-      } else {
-        console.log("no");
+
+    if (status === 200) {
+      if(role == "HOST"){
+        navigate("/generatelink", { state: { name: e.name, role: role } });
       }
-    });
+      else{
+        navigate("/pastelink", { state: { name: e.name, role: role } });
+      }
+    }
   };
   return (
     <>
@@ -64,24 +84,31 @@ export default function OtpScreen() {
                   className="p-2 w-10 rounded-xl border-2 text-center"
                   maxLength="1"
                   name="val1"
+                  ref={val1Ref}
+                  onInput={(event) => focusNext(event, val2Ref)}
                 />
                 <input
                   type="text"
                   className="p-2 w-10 rounded-xl border-2 text-center"
                   maxLength="1"
                   name="val2"
+                  ref={val2Ref}
+                  onInput={(event) => focusNext(event, val3Ref)}
                 />
                 <input
                   type="text"
                   className="p-2 w-10 rounded-xl border-2 text-center"
                   maxLength="1"
                   name="val3"
+                  ref={val3Ref}
+                  onInput={(event) => focusNext(event, val4Ref)}
                 />
                 <input
                   type="text"
                   className="p-2 w-10 rounded-xl border-2 text-center"
                   maxLength="1"
                   name="val4"
+                  ref={val4Ref}
                 />
               </div>
 

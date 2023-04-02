@@ -7,7 +7,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.tsv.implementation.Security.JwtAuthResponse;
+import com.tsv.implementation.controller.LoginController;
+import com.tsv.implementation.dto.UserLoginDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,9 +28,11 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler{
 
 	@Autowired
 	UserRepository userRepo;
-	
+
 	@Autowired
 	DefaultUserService userService;
+
+	private UserLoginDTO userLogin;
 	
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -34,7 +40,8 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler{
 
 
 		String redirectUrl = null;
-
+		/*
+		responsee.;*/
 		/*Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 		for(GrantedAuthority grantedAuthority : authorities)
 		{
@@ -47,15 +54,19 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler{
 
 		}*/
 
+		 //ResponseEntity<JwtAuthResponse> tokenResponse= loginController.createToken(userLogin);
+
 		 UserDetails userDetails = (UserDetails) authentication.getPrincipal();
          String username = userDetails.getUsername();
          User user = userRepo.findByEmail(username);
          String output = userService.generateOtp(user);
-         if(output=="success") 
-        	 redirectUrl="/login/otpVerification";
+         if(output=="success")
+        	 redirectUrl="/login/otpVerification" ;
          
 		new DefaultRedirectStrategy().sendRedirect(request, response, redirectUrl);
 		return;
 	}
+
+
 
 }

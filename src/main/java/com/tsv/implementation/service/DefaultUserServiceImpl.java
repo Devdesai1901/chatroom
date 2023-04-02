@@ -1,6 +1,5 @@
 package com.tsv.implementation.service;
 
-import java.nio.file.attribute.UserPrincipal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,43 +28,28 @@ public class DefaultUserServiceImpl implements DefaultUserService{
    @Autowired
   	private RoleRepository roleRepo;
 
-	private Set<GrantedAuthority> authorities;
-  	
-  /* @Autowired
-	 JavaMailSender javaMailSender;*/
 	@Autowired
 	JavaMailSender javaMailSender;
    
 	private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-
+	
+	
+	
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
 		User user = userRepo.findByEmail(email);
-		if (user == null) {
-			throw new UsernameNotFoundException("User not found with email: " + email);
+		if(user == null) {
+			throw new UsernameNotFoundException("Invalid username or password.");
 		}
 
-		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
-				getAuthorities(user));
+
+		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),mapRolesToAuthorities(user.getRoles()));
+//		return user;
 	}
 
-	private static final Map<String, List<String>> ROLE_AUTHORITY_MAP = new HashMap<>();
-
-	static {
-		ROLE_AUTHORITY_MAP.put("USER", Arrays.asList("USER"));
-		ROLE_AUTHORITY_MAP.put("HOST", Arrays.asList("USER", "HOST"));
-	}
-
-	private static List<GrantedAuthority> getAuthorities(User user) {
-		List<String> roleAuthorities = ROLE_AUTHORITY_MAP.get(user.getRole());
-		if (roleAuthorities == null) {
-			throw new IllegalArgumentException("Invalid user role: " + user.getRole());
-		}
-
-		return roleAuthorities.stream()
-				.map(SimpleGrantedAuthority::new)
-				.collect(Collectors.toList());
+	private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> role){
+		return role.stream().map(roles -> new SimpleGrantedAuthority(roles.getRole())).collect(Collectors.toList());
 	}
 
 //	@Override
@@ -74,16 +58,28 @@ public class DefaultUserServiceImpl implements DefaultUserService{
 //		if (user == null) {
 //			throw new UsernameNotFoundException("User not found with email: " + email);
 //		}
-//		return org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),getAuthority(user));
-//	}
-
-
-//	private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> roles){
 //
-//		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getRole())).collect(Collectors.toList());
+//		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
+//				getAuthorities(user));
 //	}
-
-
+//
+//	private static final Map<String, List<String>> ROLE_AUTHORITY_MAP = new HashMap<>();
+//
+//	static {
+//		ROLE_AUTHORITY_MAP.put("USER", Arrays.asList("USER"));
+//		ROLE_AUTHORITY_MAP.put("HOST", Arrays.asList("USER", "HOST"));
+//	}
+//
+//	private static List<GrantedAuthority> getAuthorities(User user) {
+//		List<String> roleAuthorities = ROLE_AUTHORITY_MAP.get(user.getRoles());
+//		if (roleAuthorities == null) {
+//			throw new IllegalArgumentException("Invalid user role: " + user.getRoles());
+//		}
+//
+//		return roleAuthorities.stream()
+//				.map(SimpleGrantedAuthority::new)
+//				.collect(Collectors.toList());
+//	}
 	@Override
 	public User save(UserRegisteredDTO userRegisteredDTO) {
 		Role role = new Role();
@@ -94,18 +90,16 @@ public class DefaultUserServiceImpl implements DefaultUserService{
 		{
 			role = roleRepo.findByRole("HOST");
 		}
-		else{
-			role=roleRepo.findByRole("ADMIN");
-		}
+
 
 		User user = new User();
 		user.setEmail(userRegisteredDTO.getEmail_id());
 		user.setName(userRegisteredDTO.getName());
 		user.setPassword(passwordEncoder.encode(userRegisteredDTO.getPassword()));
-		user.setRole(userRegisteredDTO.getRole());
-		user.setCollage_id(userRegisteredDTO.getCollage_id());
-		user.setSem(userRegisteredDTO.getSem());
+		user.setRoles(role);
 		user.setBranch(userRegisteredDTO.getBranch());
+		user.setSem(userRegisteredDTO.getSem());
+		user.setCollage_id(userRegisteredDTO.getCollage_id());
 		return userRepo.save(user);
 	}
 
@@ -136,7 +130,7 @@ public class DefaultUserServiceImpl implements DefaultUserService{
 			user.setOtp(randomPIN);
 			userRepo.save(user);
 			SimpleMailMessage msg = new SimpleMailMessage();
-			msg.setFrom("enter your mail id ");
+			msg.setFrom("devdesai702@gmail.com");
 			msg.setTo(user.getEmail());
 
 			msg.setSubject("Welcome To BRAINSTROME");
@@ -145,7 +139,7 @@ public class DefaultUserServiceImpl implements DefaultUserService{
 
 
 			javaMailSender.send(msg);
-
+			
 			return "success";
 			}catch (Exception e) {
 				e.printStackTrace();

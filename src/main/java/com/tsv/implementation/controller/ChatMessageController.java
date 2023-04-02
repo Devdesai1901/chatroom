@@ -3,6 +3,7 @@ package com.tsv.implementation.controller;
 //import com.chat.app.chatroomapp.App.Entity.ChatMessage;
 //import com.chat.app.chatroomapp.App.Service.ChatMessageService;
 import com.tsv.implementation.Entity.*;
+import com.tsv.implementation.Security.JwtTokenHelper;
 import com.tsv.implementation.dao.LinkRepository;
 import com.tsv.implementation.dao.MessageCountRepository;
 import com.tsv.implementation.dao.RoleRepository;
@@ -22,7 +23,6 @@ import java.util.Optional;
 import java.util.Set;
 
 @Controller
-@CrossOrigin("http://localhost:3000" )
 @RequestMapping("/api")
 public class ChatMessageController {
     @Autowired
@@ -39,6 +39,9 @@ public class ChatMessageController {
     UserRepository userRepo;
 
     @Autowired
+    JwtTokenHelper jwtTokenHelper;
+
+    @Autowired
     RoleRepository roleRepository;
 
 
@@ -49,23 +52,29 @@ public class ChatMessageController {
         // model.addAttribute("userDetails",userLoginDTO.getUsername());
         SecurityContext securityContext = SecurityContextHolder.getContext();
         UserDetails user = (UserDetails)securityContext.getAuthentication().getPrincipal();
+        //jwtTokenHelper.getUsernameFromToken()
         User users = userRepo.findByEmail(user.getUsername());
         String email = users.getEmail();
         Optional<Role> role = roleRepository.findById(users.getId());
       //  Role role =roleRepository.findByE(users.getEmail());
 
            String mainRole = null;
-            if(role == null)
+           String rolePage = null;
+            if(!(role.isEmpty()))
             {
                 Role r = role.get();
                  mainRole= r.getRole();
                 System.out.println(mainRole);
+                Link linkData = linkRepository.findByHostName(email);
+                rolePage = "HOST";
+                model.addAttribute("link",linkData.getLink());
+                model.addAttribute("role",rolePage);
             }
 
 
 
 
-        if(mainRole != "HOST" || mainRole == null)
+        if(mainRole != "HOST" && mainRole == null)
         {
             MessageCount mc = messageCountRepository.findByUserName(email);
             int linkdata =  mc.getLink();
@@ -74,6 +83,8 @@ public class ChatMessageController {
             {
                 model.addAttribute("link" ,linkdata);
                 model.addAttribute("topic",linkUser.getTopic());
+                rolePage = "USER";
+                model.addAttribute("role",rolePage);
             }
         }
 
@@ -94,7 +105,7 @@ public class ChatMessageController {
     }
     //
     @PutMapping("/groups/{groupId}/messages")
-    public void saveMessage(@RequestParam("chat_message") String message,@RequestParam("username") String mail, @PathVariable long groupId) {
+    public void saveMessage(@RequestParam("chat_message") String message,@RequestParam("username") String mail,@RequestParam("role") String roleAtt,@PathVariable long groupId) {
        ChatMessage chatMessage = new ChatMessage();
         chatMessage.setMessage(message);
         chatMessage.setGroupId(groupId);
@@ -104,7 +115,11 @@ public class ChatMessageController {
         System.out.println(groupId);
        // System.out.println(mail);
          chatMessageService.saveMessage(chatMessage);
-         messageCountController.addCount(mail);
+         System.out.println(roleAtt);
+         if(roleAtt.equals("USER"))
+         {
+             messageCountController.addCount(mail);
+         }
         // return "redirect:/count/addon";
         /*ChatMessage error_mesg = new ChatMessage();
         error_mesg.setMessage("error");

@@ -4,13 +4,11 @@ package com.tsv.implementation.controller;
 import com.tsv.implementation.Model.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin("http://localhost:3000" )
 //@RequestMapping("/messageConto")
 public class MessageControllers
 {

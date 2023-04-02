@@ -1,11 +1,11 @@
 package com.tsv.implementation.dto;
 
 public class UserLoginDTO {
-	
-private String email_id;
-	
+
+	private String email_id;
+
 	private String password;
-	
+
 	private int otp;
 
 	private String role;
@@ -41,8 +41,5 @@ private String email_id;
 	public void setOtp(int otp) {
 		this.otp = otp;
 	}
-	
-	
-	
 
 }
