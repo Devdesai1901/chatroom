@@ -130,7 +130,7 @@ public class DefaultUserServiceImpl implements DefaultUserService{
 			user.setOtp(randomPIN);
 			userRepo.save(user);
 			SimpleMailMessage msg = new SimpleMailMessage();
-			msg.setFrom("devdesai702@gmail.com");
+			msg.setFrom("");
 			msg.setTo(user.getEmail());
 
 			msg.setSubject("Welcome To BRAINSTROME");
